@@ -1,0 +1,29 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-1
+  labels:
+    app: vault-inject-secrets-demo
+spec:
+  selector:
+    matchLabels:
+      app: vault-inject-secrets-demo
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+      labels:
+        app: vault-inject-secrets-demo
+    spec:
+      shareProcessNamespace: true
+      serviceAccountName: internal-webapp-sa
+      containers:
+        - name: app
+          image: burtlo/devwebapp-ruby:k8s
+          env:
+          - name: APP_SECRET_PATH
+            value: "/vault/secrets/database-config.txt"
+          - name: VAULT_ADDR
+            value: "http://external-vault:8200"
+

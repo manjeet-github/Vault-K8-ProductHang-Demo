@@ -1,0 +1,47 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://vagrantcloud.com/search.
+
+  config.vm.provision "shell", inline: <<-SHELL
+  apt-get -y update
+  apt-get install -y git
+  apt-get install software-properties-common
+  add-apt-repository -y ppa:deadsnakes/ppa
+  apt-get -y update
+  apt-get -y install curl
+  apt-get -y install unzip
+  apt-get -y install jq
+  apt-get -y install cl-base64
+  apt-get -y install python3.6
+  apt-get -y install python3-pip
+  pip3 install awscli --upgrade
+  SHELL
+
+  # Vault Cluster - With 1 standalone server
+  config.vm.define "vault_pri" do |vault_pri|
+    vault_pri.vm.box = "ubuntu/xenial64"
+    vault_pri.vm.hostname = "vault-server"
+    vault_pri.vm.network "private_network", ip: "172.42.42.200"
+    vault_pri.vm.network "forwarded_port", guest: 8200, host: 38200
+
+    vault_pri.vm.provision "shell", path: "scripts/01.base.sh"
+    vault_pri.vm.provision "shell", path: "scripts/02.softhsm-install.sh"
+    vault_pri.vm.provision "shell", path: "scripts/03.vault-install.sh"
+    vault_pri.vm.provision "start vault", type: "shell", inline: "sudo systemctl start vault"
+    vault_pri.vm.provision "shell", path: "scripts/04.vault_init_and_unseal.sh",
+    privileged: true,
+    env: {"PATH" => "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/opt/vault/bin"}
+  end
+  
+end

@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -e
+
+PATH=`pwd`/bin:$PATH:/usr/local/bin
+
+if [ -f demo_env.sh ]; then
+    . ./demo_env.sh
+fi
+
+kubectl delete -f yaml-files/deploy-k8-webapp-1.yaml
+
+kubectl delete -f yaml-files/webapp-1-service-account.yaml
+
+vault delete auth/kubernetes/role/internal-webapp-role
+
+vault policy delete internal-webapp-policy
+
+vault secrets disable internal
+
+vault auth disable kubernetes
+
+kubectl delete -f yaml-files/vault-token-reviewer.yaml
+
+
+helm uninstall vault
+
+helm list
+
+vault secrets disable k8-data-encryption
+
+kubectl delete -f yaml-files/deploy-vault-external-service.yaml

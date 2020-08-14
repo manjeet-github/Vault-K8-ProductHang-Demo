@@ -1,0 +1,19 @@
+spec:
+  template:
+    metadata:
+      annotations:
+        # AGENT INJECTOR SETTINGS
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-status: "update"
+        vault.hashicorp.com/agent-inject-secret-database-config.txt: "internal/data/database/config"
+        vault.hashicorp.com/agent-inject-template-database-config.txt: |
+          {{- with secret "internal/data/database/config" -}}
+          postgresql://{{ .Data.data.username }}:{{ .Data.data.password }}@postgres:5432/wizard
+          {{- end -}}
+
+        # VAULT SETTINGS
+        vault.hashicorp.com/role: "internal-webapp-role"
+
+        # VAULT SETTINGS - If Vault is running in secure mode
+        # vault.hashicorp.com/tls-secret: "tls-test-client"
+        # vault.hashicorp.com/ca-cert: "vault/tls/ca.crt"

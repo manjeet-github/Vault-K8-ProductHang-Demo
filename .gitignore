@@ -1,0 +1,4 @@
+vault-vagrant/vault.lic
+/k8-ca.crt
+k8s_centos/.vagrant/
+vault-vagrant/.vagrant/
