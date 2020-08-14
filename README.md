@@ -183,3 +183,5 @@ sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.
 sudo yum install jq -y
 sudo yum install curl
 ```
+
+![Demo Arch Setup](docs/setup-workflow.png)
